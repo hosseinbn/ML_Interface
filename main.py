@@ -14,6 +14,7 @@ def app():
 # General framework configuration class
 class Options:
     def __init__(self):
+        self.xla_path = True
         self.input_size = 784
         self.target_size = 10
         self.hidden_layer_size = [512, 256]
@@ -49,7 +50,13 @@ class TensorFlow(FrameWork):
         return prediction
     def train_model(self, epoch):
         try:
-            self.model.fit(self.train_input, self.train_target, epochs=epoch)
+            if self.options.xla_path:
+                print("Train with xla path")
+                jit_scope = tf.contrib.compiler.jit.experimental_jit_scope
+                with jit_scope():
+                    self.model.fit(self.train_input, self.train_target, epochs=epoch)
+            else:
+                self.model.fit(self.train_input, self.train_target, epochs=epoch)
         except:
             print("Model not loaded")
     def save_model(self):
