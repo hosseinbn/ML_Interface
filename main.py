@@ -52,6 +52,9 @@ class TensorFlow(FrameWork):
         try:
             if self.options.xla_path:
                 print("Train with xla path")
+                config = tf.ConfigProto()
+                config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
+                sess = tf.Session(config=config)
                 jit_scope = tf.contrib.compiler.jit.experimental_jit_scope
                 with jit_scope():
                     self.model.fit(self.train_input, self.train_target, epochs=epoch)
